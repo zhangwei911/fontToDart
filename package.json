@@ -2,7 +2,7 @@
 	"name": "fonttodartts",
 	"displayName": "fontToDartTS",
 	"description": "将阿里云iconfont.json转换成Dart",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"engines": {
 		"vscode": "^1.48.0"
 	},
