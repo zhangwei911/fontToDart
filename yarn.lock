@@ -72,15 +72,20 @@
   resolved "https://registry.npm.taobao.org/@types/mocha/download/@types/mocha-8.0.3.tgz#51b21b6acb6d1b923bbdc7725c38f9f455166402"
   integrity sha1-UbIbasttG5I7vcdyXDj59FUWZAI=
 
-"@types/node@*", "@types/node@^14.6.4":
+"@types/node@*":
   version "14.6.4"
   resolved "https://registry.npm.taobao.org/@types/node/download/@types/node-14.6.4.tgz?cache=0&sync_timestamp=1599169855422&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fnode%2Fdownload%2F%40types%2Fnode-14.6.4.tgz#a145cc0bb14ef9c4777361b7bbafa5cf8e3acb5a"
   integrity sha1-oUXMC7FO+cR3c2G3u6+lz446y1o=
 
-"@types/vscode@^1.48.0":
-  version "1.48.0"
-  resolved "https://registry.npm.taobao.org/@types/vscode/download/@types/vscode-1.48.0.tgz#c1841ccf80086d53b35a9d7f2eb3b4d949bd2d2f"
-  integrity sha1-wYQcz4AIbVOzWp1/LrO02Um9LS8=
+"@types/node@^14.11.1":
+  version "14.11.1"
+  resolved "https://registry.npm.taobao.org/@types/node/download/@types/node-14.11.1.tgz?cache=0&sync_timestamp=1600368053055&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fnode%2Fdownload%2F%40types%2Fnode-14.11.1.tgz#56af902ad157e763f9ba63d671c39cda3193c835"
+  integrity sha1-Vq+QKtFX52P5umPWccOc2jGTyDU=
+
+"@types/vscode@^1.49.0":
+  version "1.49.0"
+  resolved "https://registry.npm.taobao.org/@types/vscode/download/@types/vscode-1.49.0.tgz#f3731d97d7e8b2697510eb26f6e6d04ee8c17352"
+  integrity sha1-83Mdl9fosml1EOsm9ubQTujBc1I=
 
 "@typescript-eslint/eslint-plugin@^3.8.0":
   version "3.10.1"
@@ -1664,11 +1669,6 @@ uri-js@^4.2.2:
   integrity sha1-qnFCYd55PoqCNHp7zJznTobyhgI=
   dependencies:
     punycode "^2.1.0"
-
-urijs@^1.19.2:
-  version "1.19.2"
-  resolved "https://registry.npm.taobao.org/urijs/download/urijs-1.19.2.tgz#f9be09f00c4c5134b7cb3cf475c1dd394526265a"
-  integrity sha1-+b4J8AxMUTS3yzz0dcHdOUUmJlo=
 
 url-join@^1.1.0:
   version "1.1.0"

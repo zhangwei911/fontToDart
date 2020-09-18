@@ -29,7 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
                 let myIconsCode =
                     "import 'package:flutter/cupertino.dart';\n\nclass MyIcons {\n";
                 iconJson.glyphs.forEach((icon: any) => {
-                    myIconsCode += `    static IconData ${icon.name.replace(
+                    myIconsCode += `    static IconData ${icon.font_class.replace(
                         "-",
                         "_"
                     )} = getIcons(0x${icon.unicode});\n`;

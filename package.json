@@ -2,14 +2,15 @@
 	"name": "fonttodartts",
 	"displayName": "fontToDartTS",
 	"description": "将阿里云iconfont.json转换成Dart",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"engines": {
-		"vscode": "^1.48.0"
+		"vscode": "^1.49.0"
 	},
 	"categories": [
 		"Other"
 	],
 	"publisher": "wellchang",
+	"repository": "https://github.com/zhangwei911/fontToDart.git",
 	"activationEvents": [
 		"onCommand:fonttodartts.fontToDart"
 	],
@@ -55,17 +56,16 @@
 	"devDependencies": {
 		"@types/glob": "^7.1.3",
 		"@types/mocha": "^8.0.0",
-		"@types/node": "^14.6.4",
-		"@types/vscode": "^1.48.0",
+		"@types/node": "^14.11.1",
+		"@types/vscode": "^1.49.0",
 		"@typescript-eslint/eslint-plugin": "^3.8.0",
 		"@typescript-eslint/parser": "^3.8.0",
 		"eslint": "^7.6.0",
 		"glob": "^7.1.6",
 		"mocha": "^8.0.1",
 		"typescript": "^3.8.3",
-		"vscode-test": "^1.4.0",
-		"vsce": "^1.79.5"
+		"vsce": "^1.79.5",
+		"vscode-test": "^1.4.0"
 	},
-	"dependencies": {
-	}
+	"dependencies": {}
 }
