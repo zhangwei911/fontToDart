@@ -32,10 +32,10 @@ export function activate(context: vscode.ExtensionContext) {
                     myIconsCode += `    static IconData ${icon.font_class.replace(
                         "-",
                         "_"
-                    )} = getIcons(0x${icon.unicode});\n`;
+                    )} = const IconData(0x${
+                        icon.unicode
+                    }, fontFamily: 'MyIcons');\n`;
                 });
-                myIconsCode +=
-                    "\n    static IconData getIcons(int unicode, {String fontFamily = 'MyIcons'}) => IconData(unicode, fontFamily: fontFamily);\n}";
                 console.log(myIconsCode);
                 let myIconsUris = await vscode.workspace.findFiles(
                     "**/my_icons.dart"
