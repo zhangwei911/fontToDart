@@ -2,6 +2,8 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 
+import * as xml2js from 'xml2js';
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -32,10 +34,10 @@ export function activate(context: vscode.ExtensionContext) {
                     myIconsCode += `    static IconData ${icon.font_class.replace(
                         "-",
                         "_"
-                    )} = const IconData(0x${
-                        icon.unicode
-                    }, fontFamily: 'MyIcons');\n`;
+                    )} = const IconData(0x${icon.unicode
+                        }, fontFamily: 'MyIcons');\n`;
                 });
+                myIconsCode += '}';
                 console.log(myIconsCode);
                 let myIconsUris = await vscode.workspace.findFiles(
                     "**/my_icons.dart"
@@ -45,7 +47,7 @@ export function activate(context: vscode.ExtensionContext) {
                 if (myIconsUris.length == 0) {
                     myIconsUri = vscode.Uri.file(
                         vscode.workspace.rootPath +
-                            "/lib/utils/my_icons.dart"
+                        "/lib/utils/my_icons.dart"
                     );
                 } else {
                     myIconsUri = myIconsUris[0];
@@ -69,6 +71,118 @@ export function activate(context: vscode.ExtensionContext) {
     console.log("注册fonttodartts.helloWorld成功");
     0;
     context.subscriptions.push(disposable);
+    fontSvgToDart(context);
+}
+
+function fontSvgToDart(context: vscode.ExtensionContext) {
+    let disposable = vscode.commands.registerCommand(
+        "fonttodartts.svgToDart",
+        async () => {
+            let jsUris = await vscode.window.showOpenDialog({
+                canSelectMany: false,
+                filters: { 'Js': ["js"] },
+            });
+            if (jsUris != undefined) {
+                let doc = await vscode.workspace.openTextDocument(jsUris[0]);
+                let text = doc.getText();
+                let svgXmlStr = text.substring(text.indexOf('<svg>'), text.indexOf('</svg>') + 6);
+
+                let parseString: any = xml2js.parseString;
+                parseString(svgXmlStr, async function (err: Error, result: any) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    console.log(result);
+                    let svgCode = "import 'package:flutter/cupertino.dart';\nimport 'package:flutter_svg/svg.dart';\n\nenum IconNames{";
+                    let symbolIndex = 0;
+                    let symbolLen = result.svg.symbol.length;
+                    result.svg.symbol.forEach((element: any) => {
+                        svgCode += `${element.$.id.replace('-', '_')}`;
+                        if (symbolIndex < symbolLen - 1) {
+                            svgCode += ',';
+                        }
+                        symbolIndex++;
+                    });
+                    svgCode += '}';
+                    svgCode += `\n\nclass IconFont extends StatelessWidget {
+  final IconNames name;
+  final String color;
+  final List<String> colors;
+  final double size;
+
+  IconFont(this.name, { this.size = 14, this.color, this.colors });
+
+  static String getColor(int arrayIndex, String color, List<String> colors, String defaultColor) {
+    if (color != null && color.isNotEmpty) {
+      return color;
+    }
+
+    if (colors != null && colors.isNotEmpty && colors.length > arrayIndex) {
+      return colors.elementAt(arrayIndex);
+    }
+
+    return defaultColor;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String svgXml;
+
+    switch (this.name) {`;
+                    symbolIndex = 0;
+                    result.svg.symbol.forEach((element: any) => {
+                        let paths = element.path;
+                        let pathCode = '';
+                        for (let i = 0; i < paths.length; i++) {
+                            let path = paths[i];
+                            let d = path.$.d;
+                            let color = path.$.fill;
+                            pathCode += `<path
+              d="${d}"
+              fill="''' + getColor(1, color, colors, '${color == undefined?'#000000':color}') + '''"
+            />`;
+                        }
+                        svgCode += `\ncase IconNames.${element.$.id.replace('-', '_')}:\n svgXml = '''<svg viewBox="${element.$.viewBox}" xmlns="http://www.w3.org/2000/svg">
+                        ${pathCode}
+                        </svg>''';\nbreak;\n`;
+                        symbolIndex++;
+                    });
+                    svgCode += `    }
+
+    if (svgXml == null) {
+      return new Container(width: 0, height: 0);
+    }
+
+    return SvgPicture.string(svgXml, width: this.size, height: this.size);
+  }
+}`;
+                    console.log(svgCode);
+                    let mySvgIconsUris = await vscode.workspace.findFiles(
+                        "**/my_svg_icons.dart"
+                    );
+                    console.log(mySvgIconsUris);
+                    var mySvgIconsUri: vscode.Uri;
+                    if (mySvgIconsUris.length == 0) {
+                        mySvgIconsUri = vscode.Uri.file(
+                            vscode.workspace.rootPath +
+                            "/lib/utils/my_svg_icons.dart"
+                        );
+                    } else {
+                        mySvgIconsUri = mySvgIconsUris[0];
+                    }
+                    vscode.workspace.fs.writeFile(
+                        mySvgIconsUri,
+                        stringToUint8Array(svgCode)
+                    );
+                    console.log(`写入${mySvgIconsUri.toString()}成功!`);
+                    vscode.window.showInformationMessage(
+                        `写入${mySvgIconsUri.toString()}成功!`
+                    );
+                });
+            }
+        }
+    );
+    context.subscriptions.push(disposable);
 }
 
 export function stringToUint8Array(str: String) {
@@ -82,4 +196,4 @@ export function stringToUint8Array(str: String) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }
