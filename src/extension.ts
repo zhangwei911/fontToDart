@@ -97,7 +97,9 @@ function fontSvgToDart(context: vscode.ExtensionContext) {
                     let symbolIndex = 0;
                     let symbolLen = result.svg.symbol.length;
                     result.svg.symbol.forEach((element: any) => {
-                        svgCode += `${element.$.id.replace('-', '_')}`;
+                        svgCode += `${element.$.id
+                            .replace(RegExp("-", "g"), "_")
+                            .replace("icon_", "")}`;
                         if (symbolIndex < symbolLen - 1) {
                             svgCode += ',';
                         }
@@ -141,10 +143,17 @@ function fontSvgToDart(context: vscode.ExtensionContext) {
                             let color = path.$.fill;
                             pathCode += `<path
               d="${d}"
-              fill="''' + getColor(1, color, colors, '${color == undefined?'#000000':color}') + '''"
+              fill="''' + getColor(${i}, color, colors, '${color == undefined?'#000000':color}') + '''"
             />`;
                         }
-                        svgCode += `\ncase IconNames.${element.$.id.replace('-', '_')}:\n svgXml = '''<svg viewBox="${element.$.viewBox}" xmlns="http://www.w3.org/2000/svg">
+                        svgCode += `\ncase IconNames.${element.$.id
+                            .replace(RegExp("-", "g"), "_")
+                            .replace(
+                                "icon_",
+                                ""
+                            )}:\n svgXml = '''<svg viewBox="${
+                            element.$.viewBox
+                        }" xmlns="http://www.w3.org/2000/svg">
                         ${pathCode}
                         </svg>''';\nbreak;\n`;
                         symbolIndex++;
