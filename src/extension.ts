@@ -130,9 +130,11 @@ function fontSvgToDart(context: vscode.ExtensionContext) {
 
     switch (this.name) {`;
                     symbolIndex = 0;
+                    let fastCode = '';
                     result.svg.symbol.forEach((element: any) => {
                         let paths = element.path;
                         let pathCode = '';
+                        fastCode += `IconFont.${element.$.id.replace('-', '_')}({this.color, this.colors, this.size}):name = IconNames.${element.$.id.replace('-', '_')},super();\n`;
                         for (let i = 0; i < paths.length; i++) {
                             let path = paths[i];
                             let d = path.$.d;
@@ -155,6 +157,7 @@ function fontSvgToDart(context: vscode.ExtensionContext) {
 
     return SvgPicture.string(svgXml, width: this.size, height: this.size);
   }
+  ${fastCode}
 }`;
                     console.log(svgCode);
                     let mySvgIconsUris = await vscode.workspace.findFiles(
