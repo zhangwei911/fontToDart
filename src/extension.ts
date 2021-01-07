@@ -136,14 +136,22 @@ function fontSvgToDart(context: vscode.ExtensionContext) {
                     result.svg.symbol.forEach((element: any) => {
                         let paths = element.path;
                         let pathCode = '';
-                        fastCode += `IconFont.${element.$.id.replace('-', '_')}({this.color, this.colors, this.size}):name = IconNames.${element.$.id.replace('-', '_')},super();\n`;
+                        fastCode += `IconFont.${element.$.id.replace(RegExp("-", "g"), "_")
+                            .replace(
+                                "icon_",
+                                ""
+                            )}({this.color, this.colors, this.size}):name = IconNames.${element.$.id.replace(RegExp("-", "g"), "_")
+                                .replace(
+                                    "icon_",
+                                    ""
+                                )},super();\n`;
                         for (let i = 0; i < paths.length; i++) {
                             let path = paths[i];
                             let d = path.$.d;
                             let color = path.$.fill;
                             pathCode += `<path
               d="${d}"
-              fill="''' + getColor(${i}, color, colors, '${color == undefined?'#000000':color}') + '''"
+              fill="''' + getColor(${i}, color, colors, '${color == undefined ? '#000000' : color}') + '''"
             />`;
                         }
                         svgCode += `\ncase IconNames.${element.$.id
@@ -151,9 +159,8 @@ function fontSvgToDart(context: vscode.ExtensionContext) {
                             .replace(
                                 "icon_",
                                 ""
-                            )}:\n svgXml = '''<svg viewBox="${
-                            element.$.viewBox
-                        }" xmlns="http://www.w3.org/2000/svg">
+                            )}:\n svgXml = '''<svg viewBox="${element.$.viewBox
+                            }" xmlns="http://www.w3.org/2000/svg">
                         ${pathCode}
                         </svg>''';\nbreak;\n`;
                         symbolIndex++;
