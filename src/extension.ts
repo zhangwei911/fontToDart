@@ -30,14 +30,24 @@ export function activate(context: vscode.ExtensionContext) {
                 let iconJson = JSON.parse(doc.getText());
                 let myIconsCode =
                     "import 'package:flutter/cupertino.dart';\n\nclass MyIcons {\n";
+                let getCode = `
+                        static IconData get(String iconName) {
+                            switch(iconName) {
+                                `;
                 iconJson.glyphs.forEach((icon: any) => {
-                    myIconsCode += `    static IconData ${icon.font_class.replace(
-                        "-",
-                        "_"
-                    )} = const IconData(0x${icon.unicode
-                        }, fontFamily: 'MyIcons');\n`;
+                    let iconName = icon.font_class.replace(RegExp("-", "g"), "_");
+                    myIconsCode += `    static IconData ${iconName} = const IconData(0x${icon.unicode}, fontFamily: 'MyIcons');\n`;
+                    getCode += `
+        case '${iconName}':
+            return MyIcons.${iconName};
+            break;
+                                    `;
                 });
-                myIconsCode += '}';
+                myIconsCode += getCode;
+                myIconsCode += `
+                            }
+                        }
+                    }`;
                 console.log(myIconsCode);
                 let myIconsUris = await vscode.workspace.findFiles(
                     "**/my_icons.dart"
@@ -133,18 +143,24 @@ function fontSvgToDart(context: vscode.ExtensionContext) {
     switch (this.name) {`;
                     symbolIndex = 0;
                     let fastCode = '';
+                    let getCode = `
+                        static IconFont get(String iconName,{String color ,List<String> colors, double size}) {
+                            switch(iconName) {
+                                `;
                     result.svg.symbol.forEach((element: any) => {
                         let paths = element.path;
                         let pathCode = '';
-                        fastCode += `IconFont.${element.$.id.replace(RegExp("-", "g"), "_")
+                        let iconName = element.$.id.replace(RegExp("-", "g"), "_")
                             .replace(
                                 "icon_",
                                 ""
-                            )}({this.color, this.colors, this.size}):name = IconNames.${element.$.id.replace(RegExp("-", "g"), "_")
-                                .replace(
-                                    "icon_",
-                                    ""
-                                )},super();\n`;
+                            );
+                        fastCode += `IconFont.${iconName}({this.color, this.colors, this.size}):name = IconNames.${iconName},super();\n`;
+                        getCode += `
+        case '${iconName}':
+            return IconFont.${iconName}(color:color, colors:colors, size:size);
+            break;
+                            `;
                         for (let i = 0; i < paths.length; i++) {
                             let path = paths[i];
                             let d = path.$.d;
@@ -154,17 +170,14 @@ function fontSvgToDart(context: vscode.ExtensionContext) {
               fill="''' + getColor(${i}, color, colors, '${color == undefined ? '#000000' : color}') + '''"
             />`;
                         }
-                        svgCode += `\ncase IconNames.${element.$.id
-                            .replace(RegExp("-", "g"), "_")
-                            .replace(
-                                "icon_",
-                                ""
-                            )}:\n svgXml = '''<svg viewBox="${element.$.viewBox
-                            }" xmlns="http://www.w3.org/2000/svg">
+                        svgCode += `\ncase IconNames.${iconName}:\n svgXml = '''<svg viewBox="${element.$.viewBox}" xmlns="http://www.w3.org/2000/svg">
                         ${pathCode}
                         </svg>''';\nbreak;\n`;
                         symbolIndex++;
                     });
+                    getCode += `
+                }
+            }`;
                     svgCode += `    }
 
     if (svgXml == null) {
@@ -174,6 +187,7 @@ function fontSvgToDart(context: vscode.ExtensionContext) {
     return SvgPicture.string(svgXml, width: this.size, height: this.size);
   }
   ${fastCode}
+  ${getCode}
 }`;
                     console.log(svgCode);
                     let mySvgIconsUris = await vscode.workspace.findFiles(
