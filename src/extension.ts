@@ -30,6 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
                 let iconJson = JSON.parse(doc.getText());
                 let myIconsCode =
                     "import 'package:flutter/cupertino.dart';\n\nclass MyIcons {\n";
+                let fieldCode = '';
                 let getCode = `
                         static IconData get(String iconName) {
                             switch(iconName) {
@@ -37,12 +38,14 @@ export function activate(context: vscode.ExtensionContext) {
                 iconJson.glyphs.forEach((icon: any) => {
                     let iconName = icon.font_class.replace(RegExp("-", "g"), "_");
                     myIconsCode += `    static IconData ${iconName} = const IconData(0x${icon.unicode}, fontFamily: 'MyIcons');\n`;
+                    fieldCode += `    static String ${iconName}Field = '${iconName}';\n`;
                     getCode += `
         case '${iconName}':
             return MyIcons.${iconName};
             break;
                                     `;
                 });
+                myIconsCode += fieldCode;
                 myIconsCode += getCode;
                 myIconsCode += `
                             }
@@ -147,6 +150,7 @@ function fontSvgToDart(context: vscode.ExtensionContext) {
                         static IconFont get(String iconName,{String color ,List<String> colors, double size}) {
                             switch(iconName) {
                                 `;
+                    let fieldCode = "";
                     result.svg.symbol.forEach((element: any) => {
                         let paths = element.path;
                         let pathCode = '';
@@ -156,6 +160,7 @@ function fontSvgToDart(context: vscode.ExtensionContext) {
                                 ""
                             );
                         fastCode += `IconFont.${iconName}({this.color, this.colors, this.size}):name = IconNames.${iconName},super();\n`;
+                        fieldCode += `    static String ${iconName}Field = '${iconName}';\n`;
                         getCode += `
         case '${iconName}':
             return IconFont.${iconName}(color:color, colors:colors, size:size);
@@ -187,6 +192,9 @@ function fontSvgToDart(context: vscode.ExtensionContext) {
     return SvgPicture.string(svgXml, width: this.size, height: this.size);
   }
   ${fastCode}
+
+  ${fieldCode}
+
   ${getCode}
 }`;
                     console.log(svgCode);
