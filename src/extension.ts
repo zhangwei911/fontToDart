@@ -85,6 +85,7 @@ export function activate(context: vscode.ExtensionContext) {
     0;
     context.subscriptions.push(disposable);
     fontSvgToDart(context);
+    addSingleSvgToDart(context);
 }
 
 function fontSvgToDart(context: vscode.ExtensionContext) {
@@ -223,6 +224,174 @@ function fontSvgToDart(context: vscode.ExtensionContext) {
             }
         }
     );
+    context.subscriptions.push(disposable);
+}
+
+function addSingleSvgToDart(context: vscode.ExtensionContext) {
+    let disposable = vscode.commands.registerCommand(
+        "fonttodartts.singleSvgToDart",
+        async () => {
+            let svgUris = await vscode.window.showOpenDialog({
+                canSelectMany: false,
+                filters: { 'SVG': ["svg"] },
+            });
+            if (svgUris != undefined) {
+                let mySvgIconsUris = await vscode.workspace.findFiles(
+                    "**/my_svg_icons_single.dart"
+                );
+                var mySvgIconsUri: vscode.Uri;
+                var content_1 = '';
+                var content0 = '';
+                var content1 = '';
+                var content2 = '';
+                var content3 = '';
+                var content4 = '';
+                var content5 = '';
+                var content6 = '';
+                var content7 = '';
+                var content8 = '';
+
+                content_1 = `
+                ///start-1
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_svg/svg.dart';
+
+enum IconNamesSingle {
+    ///end-1
+    `;
+                content0 = `///start0
+                    `;
+                content1 = `
+    ///start1
+}
+
+class IconFontSingle extends StatelessWidget {
+  final IconNamesSingle name;
+  final String color;
+  final List<String> colors;
+  final double size;
+
+  IconFontSingle(this.name, {this.size = 14, this.color, this.colors});
+
+  static String getColor(int arrayIndex, String color, List<String> colors, String defaultColor) {
+    if (color != null && color.isNotEmpty) {
+      return color;
+    }
+
+    if (colors != null && colors.isNotEmpty && colors.length > arrayIndex) {
+      return colors.elementAt(arrayIndex);
+    }
+
+    return defaultColor;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String svgXml;
+
+    switch (this.name) {
+      ///end1
+                `;
+                content2 = `///start2
+                    `;
+                content3 = `
+
+        ///start3
+    }
+
+    if (svgXml == null) {
+      return new Container(width: 0, height: 0);
+    }
+
+    return SvgPicture.string(svgXml, width: this.size, height: this.size);
+  }
+///end3
+                    `;
+                content4 = `///start4
+                    `;
+                content5 = `///start5
+                    `;
+                content6 = `
+
+  ///start6
+
+  static IconFontSingle get(String iconName, {String color, List<String> colors, double size}) {
+    switch (iconName) {
+      ///end6
+                    `;
+                content7 = `///start7
+                    `;
+                content8 = `
+
+        ///start8
+    }
+  }
+}
+///end8
+                    `;
+                if (mySvgIconsUris.length == 0) {
+                    mySvgIconsUri = vscode.Uri.file(
+                        vscode.workspace.rootPath +
+                        "/lib/utils/my_svg_icons_single.dart"
+                    );
+                } else {
+                    mySvgIconsUri = mySvgIconsUris[0];
+                    let svgCodeFile = await vscode.workspace.openTextDocument(mySvgIconsUri);
+                    let svgCode = svgCodeFile.getText();
+                    content0 = svgCode.substring(svgCode.indexOf('///start0'), svgCode.indexOf('///end0'));
+                    content2 = svgCode.substring(svgCode.indexOf('///start2'), svgCode.indexOf('///end2'));
+                    content4 = svgCode.substring(svgCode.indexOf('///start4'), svgCode.indexOf('///end4'));
+                    content5 = svgCode.substring(svgCode.indexOf('///start5'), svgCode.indexOf('///end5'));
+                    content7 = svgCode.substring(svgCode.indexOf('///start7'), svgCode.indexOf('///end7'));
+                }
+                let svgNames = [];
+                for (var i = 0; i < svgUris.length; i++) {
+                    let svgUri = svgUris[i];
+                    let doc = await vscode.workspace.openTextDocument(svgUri);
+                    let text = doc.getText();
+                    let colors = text.match(RegExp('#[a-zA-Z0-9]{3,6}', 'g')) ?? [];
+                    console.log(colors);
+                    for (var i = 0; i < colors.length; i++) {
+                        text = text.replace(colors[i], `'''+getColor(${i}, color, colors, "${colors[i] == undefined ? "#000000" : colors[i]}")+'''`)
+                    }
+                    let svgName = await vscode.window.showInputBox({
+                        placeHolder: `svg name (${svgUri.path})`,
+                    });
+                    if (svgName === undefined) {
+                        return;
+                    }
+                    svgNames.push(svgName);
+                    text = `case IconNamesSingle.${svgName}:
+        svgXml = '''`
+                        + text +
+                        `
+      ''';
+        break;`;
+                    content2 += text;
+                    content4 += `
+                    IconFontSingle.${svgName}({this.color, this.colors, this.size})
+      : name = IconNamesSingle.${svgName},
+        super();
+        `;
+                    content5 += `
+  static const String ${svgName}Field = '${svgName}';
+                    `;
+                    content7 += `
+      case ${svgName}Field:
+        return IconFontSingle.${svgName}(color: color, colors: colors, size: size);
+        break;
+                    `;
+                }
+                let svgNameStr = svgNames.join(',');
+                if (!content0.endsWith(',') && content0.replace('///start0', '').replace(RegExp(' ', 'g'),'').replace('\n','').length > 0) {
+                    content0 += ','
+                }
+                vscode.workspace.fs.writeFile(
+                    mySvgIconsUri,
+                    stringToUint8Array(content_1 + content0 + svgNameStr + '\n///end0' + content1 + '\n///end1' + content2 + '\n///end2' + content3 + content4 + '///end4\n' + content5 + '///end5' + content6 + content7 + '///end7' + content8)
+                );
+            }
+        });
     context.subscriptions.push(disposable);
 }
 

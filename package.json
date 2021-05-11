@@ -2,7 +2,7 @@
 	"name": "fonttodartts",
 	"displayName": "fontToDartTS",
 	"description": "将阿里云iconfont.json/js转换成Dart",
-	"version": "0.0.9",
+	"version": "0.0.10",
 	"engines": {
 		"vscode": "^1.49.0"
 	},
@@ -13,7 +13,8 @@
 	"repository": "https://github.com/zhangwei911/fontToDart.git",
 	"activationEvents": [
 		"onCommand:fonttodartts.fontToDart",
-		"onCommand:fonttodartts.svgToDart"
+		"onCommand:fonttodartts.svgToDart",
+		"onCommand:fonttodartts.singleSvgToDart"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -25,6 +26,10 @@
 			{
 				"command": "fonttodartts.svgToDart",
 				"title": "svgToDart"
+			}, 
+			{
+				"command": "fonttodartts.singleSvgToDart",
+				"title": "singleSvgToDart"
 			}
 		],
 		"configuration": [
